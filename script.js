@@ -14,15 +14,24 @@ async function loadQuestions() {
     try {
         const response = await fetch(API_URL);
         const data = await response.json();
+        
+        // Decode special characters like &quot; and &#039;
         questions = data.results.map(q => ({
-            question: q.question,
-            options: [...q.incorrect_answers, q.correct_answer].sort(() => Math.random() - 0.5),
-            answer: q.correct_answer
+            question: decodeHTMLEntities(q.question),
+            options: [...q.incorrect_answers, q.correct_answer].sort(() => Math.random() - 0.5).map(decodeHTMLEntities),
+            answer: decodeHTMLEntities(q.correct_answer)
         }));
+
         displayQuestion();
     } catch (error) {
         console.error("Failed to load questions", error);
     }
+}
+
+// Function to decode HTML entities
+function decodeHTMLEntities(text) {
+    let doc = new DOMParser().parseFromString(text, "text/html");
+    return doc.documentElement.textContent;
 }
 
 // Display a question
