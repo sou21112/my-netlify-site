@@ -1,12 +1,18 @@
 // script.js (For JavaScript)
-const questions = [
-    { question: "What is 2 + 2?", options: ["3", "4", "5"], answer: 1 },
-    { question: "What is the capital of France?", options: ["Berlin", "Madrid", "Paris"], answer: 2 },
-    { question: "Which planet is known as the Red Planet?", options: ["Earth", "Mars", "Jupiter"], answer: 1 }
-];
+const questions = Array.from({ length: 5000 }, (_, i) => ({
+    question: `Question ${i + 1}: What is the answer?`,
+    options: ["Option 1", "Option 2", "Option 3", "Option 4"],
+    answer: Math.floor(Math.random() * 4)
+}));
 
 let currentQuestion = 0;
 let score = 0;
+
+function startQuiz() {
+    document.getElementById("home").style.display = "none";
+    document.getElementById("quiz").style.display = "block";
+    loadQuestion();
+}
 
 function loadQuestion() {
     if (currentQuestion >= questions.length) {
