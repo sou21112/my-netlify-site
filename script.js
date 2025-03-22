@@ -45,11 +45,12 @@ function displayQuestion() {
     document.getElementById("question").innerHTML = q.question;
     const optionsList = document.getElementById("options");
     optionsList.innerHTML = "";
+    document.getElementById("next-btn").style.display = "none"; // Hide Next button initially
 
     q.options.forEach(option => {
         const li = document.createElement("li");
         li.textContent = option;
-        li.onclick = () => checkAnswer(option);
+        li.onclick = () => checkAnswer(li, option);
         optionsList.appendChild(li);
     });
 
@@ -68,19 +69,36 @@ function startTimer() {
 
         if (timeLeft === 0) {
             clearInterval(timer);
-            nextQuestion();
+            showCorrectAnswer();
         }
     }, 1000);
 }
 
 // Check answer
-function checkAnswer(selectedOption) {
+function checkAnswer(selectedLi, selectedOption) {
     clearInterval(timer);
 
-    if (selectedOption === questions[currentQuestionIndex].answer) {
+    let correctAnswer = questions[currentQuestionIndex].answer;
+    let allOptions = document.querySelectorAll("#options li");
+
+    allOptions.forEach(li => {
+        li.style.pointerEvents = "none"; // Disable clicking after selecting
+        if (li.textContent === correctAnswer) {
+            li.style.backgroundColor = "green"; // Highlight correct answer
+        }
+    });
+
+    if (selectedOption !== correctAnswer) {
+        selectedLi.style.backgroundColor = "red"; // Highlight wrong answer
+    } else {
         score++;
     }
 
+    document.getElementById("next-btn").style.display = "block"; // Show Next button
+}
+
+// Move to next question
+function nextQuestion() {
     currentQuestionIndex++;
     displayQuestion();
 }
