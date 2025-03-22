@@ -1,53 +1,80 @@
-// script.js
-const API_URL = "https://opentdb.com/api.php?amount=10&type=multiple";
-let questions = [], currentQuestion = 0, score = 0;
+const params = new URLSearchParams(window.location.search);
+const category = params.get("category") || 9;
+const difficulty = params.get("difficulty") || "easy";
 
-async function fetchQuestions() {
-    const response = await fetch(API_URL);
-    const data = await response.json();
-    questions = data.results.map(q => ({
-        question: q.question,
-        options: [...q.incorrect_answers, q.correct_answer].sort(() => Math.random() - 0.5),
-        answer: q.correct_answer
-    }));
-    loadQuestion();
+const API_URL = `https://opentdb.com/api.php?amount=10&category=${category}&difficulty=${difficulty}&type=multiple`;
+
+let questions = [];
+let currentQuestionIndex = 0;
+let score = 0;
+let timer;
+
+// Fetch questions from API
+async function loadQuestions() {
+    try {
+        const response = await fetch(API_URL);
+        const data = await response.json();
+        questions = data.results.map(q => ({
+            question: q.question,
+            options: [...q.incorrect_answers, q.correct_answer].sort(() => Math.random() - 0.5),
+            answer: q.correct_answer
+        }));
+        displayQuestion();
+    } catch (error) {
+        console.error("Failed to load questions", error);
+    }
 }
 
-function startQuiz() {
-    document.getElementById("home").style.display = "none";
-    document.getElementById("quiz").style.display = "block";
-    fetchQuestions();
-}
-
-function loadQuestion() {
-    if (currentQuestion >= questions.length) {
-        document.getElementById("quiz").style.display = "none";
-        document.getElementById("result").style.display = "block";
-        document.getElementById("score").innerText = `You scored ${score}/${questions.length}`;
+// Display a question
+function displayQuestion() {
+    if (currentQuestionIndex >= questions.length) {
+        document.querySelector(".quiz-container").innerHTML = `<h2>Quiz Over!</h2><p>Your Score: ${score}/${questions.length}</p>`;
         return;
     }
-    const q = questions[currentQuestion];
+
+    const q = questions[currentQuestionIndex];
     document.getElementById("question").innerHTML = q.question;
     const optionsList = document.getElementById("options");
     optionsList.innerHTML = "";
+
     q.options.forEach(option => {
         const li = document.createElement("li");
-        li.innerHTML = `<input type="radio" name="option" value="${option}"> ${option}`;
+        li.textContent = option;
+        li.onclick = () => checkAnswer(option);
         optionsList.appendChild(li);
     });
+
+    startTimer();
 }
 
-function nextQuestion() {
-    const selected = document.querySelector("input[name='option']:checked");
-    if (!selected) return alert("Please select an answer");
-    if (selected.value === questions[currentQuestion].answer) score++;
-    currentQuestion++;
-    loadQuestion();
+// Timer Function
+function startTimer() {
+    let timeLeft = 30;
+    document.getElementById("time").textContent = timeLeft;
+
+    clearInterval(timer);
+    timer = setInterval(() => {
+        timeLeft--;
+        document.getElementById("time").textContent = timeLeft;
+
+        if (timeLeft === 0) {
+            clearInterval(timer);
+            nextQuestion();
+        }
+    }, 1000);
 }
 
-function restartQuiz() {
-    currentQuestion = 0;
-    score = 0;
-    document.getElementById("result").style.display = "none";
-    document.getElementById("home").style.display = "block";
+// Check answer
+function checkAnswer(selectedOption) {
+    clearInterval(timer);
+
+    if (selectedOption === questions[currentQuestionIndex].answer) {
+        score++;
+    }
+
+    currentQuestionIndex++;
+    displayQuestion();
 }
+
+// Load questions on start
+window.onload = loadQuestions;
