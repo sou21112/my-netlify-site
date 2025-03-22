@@ -1,11 +1,5 @@
-/* style.css (For styling) */
-body { font-family: Arial, sans-serif; text-align: center; background: linear-gradient(to right, #4facfe, #00f2fe); color: white; }
-header { background: rgba(0, 0, 0, 0.8); padding: 10px; }
-nav ul { list-style: none; display: flex; justify-content: center; padding: 0; }
-nav ul li { margin: 0 15px; }
-nav ul li a { color: white; text-decoration: none; font-size: 18px; }
-.container { max-width: 600px; margin: auto; padding: 20px; background: white; color: black; border-radius: 10px; }
-.question { font-size: 20px; margin-bottom: 10px; }
-.options { list-style: none; padding: 0; }
-.options li { margin: 5px 0; }
-button { margin-top: 10px; padding: 10px; cursor: pointer; background: #4facfe; color: white; border: none; border-radius: 5px; }
+/* style.css */
+body { font-family: Arial, sans-serif; text-align: center; background: #f4f4f4; }
+header { background: #333; color: white; padding: 10px; }
+main { padding: 20px; }
+button { padding: 10px; background: #28a745; color: white; border: none; cursor: pointer; }
