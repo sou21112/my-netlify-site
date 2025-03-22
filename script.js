@@ -15,7 +15,6 @@ async function loadQuestions() {
         const response = await fetch(API_URL);
         const data = await response.json();
         
-        // Decode special characters like &quot; and &#039;
         questions = data.results.map(q => ({
             question: decodeHTMLEntities(q.question),
             options: [...q.incorrect_answers, q.correct_answer].sort(() => Math.random() - 0.5).map(decodeHTMLEntities),
@@ -37,7 +36,11 @@ function decodeHTMLEntities(text) {
 // Display a question
 function displayQuestion() {
     if (currentQuestionIndex >= questions.length) {
-        document.querySelector(".quiz-container").innerHTML = `<h2>Quiz Over!</h2><p>Your Score: ${score}/${questions.length}</p><button onclick="restartQuiz()">Restart</button>`;
+        document.querySelector(".quiz-container").innerHTML = `
+            <h2>Quiz Over!</h2>
+            <p>Your Score: ${score}/${questions.length}</p>
+            <button onclick="restartQuiz()">Restart Quiz</button>
+        `;
         return;
     }
 
@@ -103,7 +106,7 @@ function nextQuestion() {
     displayQuestion();
 }
 
-// Restart Quiz
+// Restart Quiz (Back to Home)
 function restartQuiz() {
     window.location.href = "index.html";
 }
