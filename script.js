@@ -37,7 +37,7 @@ function decodeHTMLEntities(text) {
 // Display a question
 function displayQuestion() {
     if (currentQuestionIndex >= questions.length) {
-        document.querySelector(".quiz-container").innerHTML = `<h2>Quiz Over!</h2><p>Your Score: ${score}/${questions.length}</p>`;
+        document.querySelector(".quiz-container").innerHTML = `<h2>Quiz Over!</h2><p>Your Score: ${score}/${questions.length}</p><button onclick="restartQuiz()">Restart</button>`;
         return;
     }
 
@@ -45,7 +45,7 @@ function displayQuestion() {
     document.getElementById("question").innerHTML = q.question;
     const optionsList = document.getElementById("options");
     optionsList.innerHTML = "";
-    document.getElementById("next-btn").style.display = "none"; // Hide Next button initially
+    document.getElementById("next-btn").style.display = "none"; 
 
     q.options.forEach(option => {
         const li = document.createElement("li");
@@ -82,25 +82,30 @@ function checkAnswer(selectedLi, selectedOption) {
     let allOptions = document.querySelectorAll("#options li");
 
     allOptions.forEach(li => {
-        li.style.pointerEvents = "none"; // Disable clicking after selecting
+        li.style.pointerEvents = "none"; 
         if (li.textContent === correctAnswer) {
-            li.style.backgroundColor = "green"; // Highlight correct answer
+            li.classList.add("correct");
         }
     });
 
     if (selectedOption !== correctAnswer) {
-        selectedLi.style.backgroundColor = "red"; // Highlight wrong answer
+        selectedLi.classList.add("wrong");
     } else {
         score++;
     }
 
-    document.getElementById("next-btn").style.display = "block"; // Show Next button
+    document.getElementById("next-btn").style.display = "block";
 }
 
 // Move to next question
 function nextQuestion() {
     currentQuestionIndex++;
     displayQuestion();
+}
+
+// Restart Quiz
+function restartQuiz() {
+    window.location.href = "index.html";
 }
 
 // Load questions on start
