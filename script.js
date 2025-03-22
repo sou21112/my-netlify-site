@@ -1,32 +1,38 @@
-// script.js (For JavaScript)
-const questions = Array.from({ length: 5000 }, (_, i) => ({
-    question: `Question ${i + 1}: What is the answer?`,
-    options: ["Option 1", "Option 2", "Option 3", "Option 4"],
-    answer: Math.floor(Math.random() * 4)
-}));
+// script.js
+const API_URL = "https://opentdb.com/api.php?amount=10&type=multiple";
+let questions = [], currentQuestion = 0, score = 0;
 
-let currentQuestion = 0;
-let score = 0;
+async function fetchQuestions() {
+    const response = await fetch(API_URL);
+    const data = await response.json();
+    questions = data.results.map(q => ({
+        question: q.question,
+        options: [...q.incorrect_answers, q.correct_answer].sort(() => Math.random() - 0.5),
+        answer: q.correct_answer
+    }));
+    loadQuestion();
+}
 
 function startQuiz() {
     document.getElementById("home").style.display = "none";
     document.getElementById("quiz").style.display = "block";
-    loadQuestion();
+    fetchQuestions();
 }
 
 function loadQuestion() {
     if (currentQuestion >= questions.length) {
         document.getElementById("quiz").style.display = "none";
-        document.getElementById("result").innerText = `Quiz over! You scored ${score}/${questions.length}`;
+        document.getElementById("result").style.display = "block";
+        document.getElementById("score").innerText = `You scored ${score}/${questions.length}`;
         return;
     }
     const q = questions[currentQuestion];
-    document.querySelector(".question").innerText = q.question;
-    const optionsList = document.querySelector(".options");
+    document.getElementById("question").innerHTML = q.question;
+    const optionsList = document.getElementById("options");
     optionsList.innerHTML = "";
-    q.options.forEach((option, index) => {
+    q.options.forEach(option => {
         const li = document.createElement("li");
-        li.innerHTML = `<input type="radio" name="option" value="${index}"> ${option}`;
+        li.innerHTML = `<input type="radio" name="option" value="${option}"> ${option}`;
         optionsList.appendChild(li);
     });
 }
@@ -34,11 +40,14 @@ function loadQuestion() {
 function nextQuestion() {
     const selected = document.querySelector("input[name='option']:checked");
     if (!selected) return alert("Please select an answer");
-    if (parseInt(selected.value) === questions[currentQuestion].answer) {
-        score++;
-    }
+    if (selected.value === questions[currentQuestion].answer) score++;
     currentQuestion++;
     loadQuestion();
 }
 
-loadQuestion();
+function restartQuiz() {
+    currentQuestion = 0;
+    score = 0;
+    document.getElementById("result").style.display = "none";
+    document.getElementById("home").style.display = "block";
+}
